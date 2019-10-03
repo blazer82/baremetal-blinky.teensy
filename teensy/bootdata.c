@@ -1,5 +1,3 @@
-//#include "imxrt.h"
-
 #include <stdint.h>
 
 extern void startup(void);

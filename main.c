@@ -9,7 +9,20 @@ void main()
     GPIO7_GDIR |= (1 << 3);
 
     for(;;) {
+        volatile unsigned int i = 0;
+
         GPIO7_DR_SET = (1 << 3);
-        // TODO add delay and make it blink
+
+        while(i < 10000000) {
+            i++;
+        }
+
+        i = 0;
+
+        GPIO7_DR_CLEAR = (1 << 3);
+
+        while(i < 10000000) {
+            i++;
+        }
     }
 }

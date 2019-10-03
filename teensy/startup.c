@@ -21,7 +21,7 @@ void startup()
 {
     unsigned int i;
 
-    // What's this 1062 specific code doing?
+    // FlexRAM bank configuration
     IOMUXC_GPR_GPR17 = (uint32_t)&_flexram_bank_config;
 	IOMUXC_GPR_GPR16 = 0x00000007;
 	IOMUXC_GPR_GPR14 = 0x00AA0000;
