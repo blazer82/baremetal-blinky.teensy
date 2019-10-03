@@ -5,16 +5,16 @@ build/firmware.elf: build/main.o build/startup.o build/bootdata.o
 	arm-none-eabi-ld -Tteensy/imxrt1062.ld -o build/firmware.elf build/bootdata.o build/startup.o build/main.o
 
 build/main.o: main.c
-	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m3 -mthumb -o build/main.o main.c
+	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m7 -mthumb -o build/main.o main.c
 
 build/startup.o: teensy/startup.c
-	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m3 -mthumb -o build/startup.o teensy/startup.c
+	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m7 -mthumb -o build/startup.o teensy/startup.c
 
 build/bootdata.o: teensy/bootdata.c
-	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m3 -mthumb -o build/bootdata.o teensy/bootdata.c
+	arm-none-eabi-gcc -O0 -c -g -mcpu=cortex-m7 -mthumb -o build/bootdata.o teensy/bootdata.c
 
 asm:
-	arm-none-eabi-gcc -S -mcpu=cortex-m3 -mthumb main.c && more main.s
+	arm-none-eabi-gcc -S -mcpu=cortex-m7 -mthumb main.c && more main.s
 
 clean:
 	rm -rf build/*
