@@ -27,9 +27,6 @@ build/startup.o: teensy/startup.c
 build/bootdata.o: teensy/bootdata.c
 	$(CC) $(CFLAGS) -o build/bootdata.o teensy/bootdata.c
 
-asm:
-	$(CC) -S -mcpu=$(CPUARCH) -mthumb main.c && more main.s
-
 clean:
 	rm -rf build/*
 
