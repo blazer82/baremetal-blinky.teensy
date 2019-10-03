@@ -10,5 +10,6 @@ void main()
 
     for(;;) {
         GPIO7_DR_SET = (1 << 3);
+        // TODO add delay and make it blink
     }
 }
