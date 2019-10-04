@@ -1,4 +1,5 @@
-CFLAGS = -O3 -Wall -c -g -mcpu=cortex-m7 -mthumb
+CFLAGS = -O3 -Wall -mcpu=cortex-m7 -mthumb
+LDFLAGS = -Wl,--gc-sections,--print-gc-sections,--print-memory-usage -nostdlib -nostartfiles -Tteensy/imxrt1062.ld
 
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
@@ -9,23 +10,22 @@ LOADER = teensy_loader_cli
 
 OUTFILE = firmware
 
+C_FILES = $(wildcard teensy/*.c)
+OBJ = $(C_FILES:teensy/%.c=build/%.o)
+
 prog: build/$(OUTFILE).elf
 	$(OBJCOPY) -O ihex -R .eeprom build/$(OUTFILE).elf build/$(OUTFILE).hex
 	$(OBJDUMP) -d -S -C build/$(OUTFILE).elf > build/$(OUTFILE).lst
-	$(OBJDUMP) -t -C build/$(OUTFILE).elf > build/$(OUTFILE).sym
 	$(SIZE) build/$(OUTFILE).elf
 
 build/$(OUTFILE).elf: build/main.o build/startup.o build/bootdata.o
-	$(LD) -Tteensy/imxrt1062.ld -o build/$(OUTFILE).elf build/bootdata.o build/startup.o build/main.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 build/main.o: main.c
-	$(CC) $(CFLAGS) -o build/main.o main.c
+	$(CC) $(CFLAGS) -c -o $@ $^
 
-build/startup.o: teensy/startup.c
-	$(CC) $(CFLAGS) -o build/startup.o teensy/startup.c
-
-build/bootdata.o: teensy/bootdata.c
-	$(CC) $(CFLAGS) -o build/bootdata.o teensy/bootdata.c
+build/%.o: teensy/%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -rf build/*
