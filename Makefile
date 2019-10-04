@@ -13,7 +13,9 @@ OUTFILE = firmware
 C_FILES = $(wildcard teensy/*.c)
 OBJ = $(C_FILES:teensy/%.c=build/%.o)
 
-prog: build/$(OUTFILE).elf
+prog: build/$(OUTFILE).hex
+
+build/$(OUTFILE).hex: build/$(OUTFILE).elf
 	$(OBJCOPY) -O ihex -R .eeprom build/$(OUTFILE).elf build/$(OUTFILE).hex
 	$(OBJDUMP) -d -S -C build/$(OUTFILE).elf > build/$(OUTFILE).lst
 	$(SIZE) build/$(OUTFILE).elf
@@ -27,8 +29,8 @@ build/main.o: main.c
 build/%.o: teensy/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+flash: build/$(OUTFILE).hex
+	$(LOADER) --mcu=TEENSY40 -w -v $<
+
 clean:
 	rm -rf build/*
-
-flash:
-	$(LOADER) --mcu=TEENSY40 -w -v build/$(OUTFILE).hex
