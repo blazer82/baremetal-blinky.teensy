@@ -1,4 +1,4 @@
-CFLAGS = -O3  -c -g -mcpu=cortex-m7 -mthumb
+CFLAGS = -O3 -Wall -c -g -mcpu=cortex-m7 -mthumb
 
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld

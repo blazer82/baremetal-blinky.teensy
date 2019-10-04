@@ -19,8 +19,6 @@ void main();
 __attribute__((section(".startup"), optimize("no-tree-loop-distribute-patterns"), naked))
 void startup()
 {
-    unsigned int i;
-
     // FlexRAM bank configuration
     IOMUXC_GPR_GPR17 = (uint32_t)&_flexram_bank_config;
     IOMUXC_GPR_GPR16 = 0x00000007;

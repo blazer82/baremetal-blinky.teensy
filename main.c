@@ -1,6 +1,6 @@
 #include "teensy/imxrt.h"
 
-void main()
+int main()
 {
     // Light up internal LED
     IOMUXC_SW_MUX_CTL_PAD_GPIO_B0_03 = 5;
