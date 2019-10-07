@@ -17,11 +17,12 @@ prog: build/$(OUTFILE).hex
 
 build/$(OUTFILE).hex: build/$(OUTFILE).elf
 	$(OBJCOPY) -O ihex -R .eeprom build/$(OUTFILE).elf build/$(OUTFILE).hex
+	$(OBJDUMP) -d -x build/$(OUTFILE).elf > build/$(OUTFILE).dis
 	$(OBJDUMP) -d -S -C build/$(OUTFILE).elf > build/$(OUTFILE).lst
 	$(SIZE) build/$(OUTFILE).elf
 
 build/$(OUTFILE).elf: build/main.o build/startup.o build/bootdata.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -Xlinker -Map=build/$(OUTFILE).map $(LDFLAGS) -o $@ $^
 
 build/main.o: main.c
 	$(CC) $(CFLAGS) -c -o $@ $^
