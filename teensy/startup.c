@@ -1,4 +1,4 @@
-#include "imxrt.h"
+#include "imxrt1062.h"
 
 extern unsigned long _stextload;
 extern unsigned long _stext;

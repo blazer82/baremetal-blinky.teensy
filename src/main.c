@@ -1,4 +1,4 @@
-#include "teensy/imxrt.h"
+#include "imxrt1062.h"
 
 int main()
 {

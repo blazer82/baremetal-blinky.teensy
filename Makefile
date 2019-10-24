@@ -1,6 +1,3 @@
-CFLAGS = -O3 -Wall -mcpu=cortex-m7 -mthumb
-LDFLAGS = -Wl,--gc-sections,--print-gc-sections,--print-memory-usage -nostdlib -nostartfiles -Tteensy/imxrt1062.ld
-
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
@@ -10,28 +7,42 @@ LOADER = teensy_loader_cli
 
 OUTFILE = firmware
 
-C_FILES = $(wildcard teensy/*.c)
-OBJ = $(C_FILES:teensy/%.c=build/%.o)
+BUILD_DIR = ./build
+SRC_DIRS ?= ./src ./teensy ./include
 
-prog: build/$(OUTFILE).hex
+SRCS := $(shell find $(SRC_DIRS) -name *.c -or -name *.s)
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+DEPS := $(OBJS:.o=.d)
 
-build/$(OUTFILE).hex: build/$(OUTFILE).elf
-	$(OBJCOPY) -O ihex -R .eeprom build/$(OUTFILE).elf build/$(OUTFILE).hex
-	$(OBJDUMP) -d -x build/$(OUTFILE).elf > build/$(OUTFILE).dis
-	$(OBJDUMP) -d -S -C build/$(OUTFILE).elf > build/$(OUTFILE).lst
-	$(SIZE) build/$(OUTFILE).elf
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-build/$(OUTFILE).elf: build/main.o build/startup.o build/bootdata.o
-	$(CC) $(CFLAGS) -Xlinker -Map=build/$(OUTFILE).map $(LDFLAGS) -o $@ $^
+CFLAGS = -O3 -Wall -Werror -mcpu=cortex-m7 -mthumb $(INC_FLAGS)
+LDFLAGS = -Wl,--gc-sections,--print-gc-sections,--print-memory-usage -nostdlib -nostartfiles -Tteensy/imxrt1062.ld
 
-build/main.o: main.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+$(BUILD_DIR)/$(OUTFILE).hex: $(BUILD_DIR)/$(OUTFILE).elf
+	@$(OBJCOPY) -O ihex -R .eeprom build/$(OUTFILE).elf build/$(OUTFILE).hex
+	@$(OBJDUMP) -d -x build/$(OUTFILE).elf > build/$(OUTFILE).dis
+	@$(OBJDUMP) -d -S -C build/$(OUTFILE).elf > build/$(OUTFILE).lst
+	@$(SIZE) build/$(OUTFILE).elf
 
-build/%.o: teensy/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(BUILD_DIR)/$(OUTFILE).elf: $(OBJS)
+	@$(CC) $(CFLAGS) -Xlinker -Map=build/$(OUTFILE).map $(LDFLAGS) -o $@ $^
 
-flash: build/$(OUTFILE).hex
+$(BUILD_DIR)/%.s.o: %.s
+	@$(MKDIR_P) $(dir $@)
+	@$(AS) $(ASFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.c.o: %.c
+	@$(MKDIR_P) $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: flash
+flash: $(BUILD_DIR)/$(OUTFILE).hex
 	$(LOADER) --mcu=TEENSY40 -w -v $<
 
+.PHONY: clean
 clean:
-	rm -rf build/*
+	@$(RM) -r $(BUILD_DIR)
+
+MKDIR_P ?= mkdir -p
